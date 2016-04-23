@@ -15,14 +15,29 @@ import React, {
 } from 'react-native';
 
 class MainPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loadingData: true,
+    }
+  }
   render() {
     return (
       <View style={styles.container}>
         <ActivityIndicatorIOS
-          animating={true}
-          size="large" />
+          animating={this.state.loadingData}
+          size="large"
+          hidesWhenStopped={true} />
       </View>
     );
+  }
+  componentDidMount() {
+    const self = this;
+    setTimeout(()=> {
+      self.setState({
+        loadingData: false,
+      })
+    }, 3000);
   }
 }
 
