@@ -8,11 +8,62 @@ import React, {
   ActivityIndicatorIOS,
   AppRegistry,
   Component,
+  ListView,
   StyleSheet,
   Text,
   View,
   NavigatorIOS,
 } from 'react-native';
+
+import { getFetchUrl, parseData } from './src/utils'
+
+class TimeBoard extends Component {
+  constructor(props) {
+    super(props);
+    var getSectionData = (dataBlob, sectionID) => {
+      console.log('section:', sectionID);
+        return dataBlob[sectionID];
+    };
+    var getRowData = (dataBlob, sectionID, rowID) => {
+      console.log('row:', rowID);
+        return dataBlob[rowID];
+    };
+    const ds = new ListView.DataSource({
+      getRowData: getRowData,
+      getSectionHeadData: getSectionData,
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+    });
+    let dataBlob = {
+      section1: 'section1',
+      '11': 'hihihihi',
+      '22': 'yoyoyoy'
+    };
+    let sectionIDs = ['section1'];
+    let rowIDs = [['11', '22']];
+    this.state = {
+      dataSource: ds.cloneWithRowsAndSections(dataBlob, sectionIDs, rowIDs),
+    };
+  }
+  render() {
+    return (
+      <ListView
+      dataSource={this.state.dataSource}
+      renderSectionHeader={this.renderSectionHeader}
+      renderRow={(rowData) => <Text>{rowData}</Text>} />
+    );
+  }
+
+  renderSectionHeader(sectionData: string, sectionID: string) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionText}>
+          {sectionData}
+        </Text>
+      </View>
+    );
+  }
+}
 
 class MainPage extends Component {
   constructor(props) {
@@ -22,22 +73,46 @@ class MainPage extends Component {
     }
   }
   render() {
+    console.log('===movieData', this.state.movieData);
+    var mainStyle = this.state.loadingData ? styles.container : styles.timeBoard;
+    var timeBoardComponent = this.state.loadingData ? null : <TimeBoard />;
     return (
-      <View style={styles.container}>
-        <ActivityIndicatorIOS
+      <View style={mainStyle}>
+        {<ActivityIndicatorIOS
           animating={this.state.loadingData}
           size="large"
-          hidesWhenStopped={true} />
+          hidesWhenStopped={true} />}
+        {timeBoardComponent}
       </View>
     );
   }
   componentDidMount() {
     const self = this;
-    setTimeout(()=> {
-      self.setState({
-        loadingData: false,
-      })
-    }, 3000);
+    this.fetchLocation().then((position) => {
+
+      const location = position.coords.latitude + ',' + position.coords.longitude;
+      fetch(getFetchUrl(location))
+            .then((response) => response.json())
+            .then((responseData) => {
+                self.setState({
+                  loadingData: false,
+                  movieData: parseData(responseData),
+                })
+            })
+            .done();
+    })
+  }
+
+  fetchLocation() {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+          (initialPosition) => {
+            resolve(initialPosition);
+          },
+          (error) => reject(error),
+          {enableHighAccuracy: true, maximumAge: 1000}
+      );
+    });
   }
 }
 
@@ -63,6 +138,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  timeBoard: {
+    flex: 1,
+    paddingTop: 30,
+    backgroundColor: '#ffffff'
+  },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
@@ -72,6 +152,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  section: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      padding: 6,
+      backgroundColor: '#400090',
+      shadowColor: "#000000",
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      shadowOffset: {
+        height: 2,
+        width: 0
+      },
+      opacity: 0.8,
+  },
+  sectionText: {
+    color: '#ffffff',
+    paddingHorizontal: 12,
+    fontWeight: 'bold',
+    fontSize: 20,
+    flex: 15,
   },
 });
 
