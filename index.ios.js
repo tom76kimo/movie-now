@@ -102,7 +102,6 @@ class MainPage extends Component {
     }
   }
   render() {
-    console.log('===movieData', this.state.movieData);
     var mainStyle = this.state.loadingData ? styles.container : styles.timeBoard;
     var timeBoardComponent = this.state.loadingData ? null : <TimeBoard movieData={this.state.movieData} />;
     return (
