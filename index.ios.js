@@ -8,6 +8,7 @@ import React, {
   ActivityIndicatorIOS,
   AppRegistry,
   Component,
+  Dimensions,
   ListView,
   StyleSheet,
   Text,
@@ -26,7 +27,8 @@ class TimeBoard extends Component {
       <ListView
       dataSource={this.generateDataSource(this.props.movieData)}
       renderSectionHeader={this.renderSectionHeader}
-      renderRow={(rowData) => <Text>{rowData}</Text>} />
+      renderRow={this.renderRow}
+      renderSeparator={this.renderSeparator} />
     );
   }
 
@@ -53,7 +55,7 @@ class TimeBoard extends Component {
       if (theater.showtimes && theater.showtimes.length) {
         let rowData = [];
         theater.showtimes.forEach((time, index) => {
-          dataBlob['row' + index] = time.movieName;
+          dataBlob['row' + index] = time;
           rowData.push('row' + index);
         });
         rowIDs[theaterIndex] = rowData;
@@ -69,6 +71,24 @@ class TimeBoard extends Component {
           {sectionData.theaterName}
         </Text>
       </View>
+    );
+  }
+
+  renderRow(rowData) {
+    return (
+      <View style={styles.rowView}>
+        <View style={{flex: 1, justifyContent: 'center',}}><Text numberOfLines={1}>{rowData.movieName}</Text></View>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center',}}>
+          <View style={{flex: 1, justifyContent: 'center'}}><Text numberOfLines={1}>{rowData.times[0] || '-'}</Text></View>
+          <View style={{flex: 1, justifyContent: 'center'}}><Text numberOfLines={1}>{rowData.times[1] || '-'}</Text></View>
+        </View>
+      </View>
+    );
+  }
+
+  renderSeparator(sectionID, rowID, adjacentRowHighlighted) {
+    return (
+      <View key={sectionID + rowID} style={{height: 0.5, backgroundColor: '#aaaaaa', flex: 1}}></View>
     );
   }
 }
@@ -184,6 +204,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     flex: 15,
   },
+  rowView: {
+    flex: 1,
+    flexDirection: 'row',
+    height: Dimensions.get('window').height / 23,
+    paddingLeft: 5,
+  }
 });
 
 AppRegistry.registerComponent('MovieNow', () => MovieNow);
