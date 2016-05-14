@@ -1,2 +1,4 @@
 # movie-now
-Fetch closest location theater with latest time movies
+An app of fetching closest location theaters with latest time movies
+
+React Native + YQL
