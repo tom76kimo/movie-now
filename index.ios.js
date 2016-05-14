@@ -20,12 +20,21 @@ import { getFetchUrl, parseData } from './src/utils'
 class TimeBoard extends Component {
   constructor(props) {
     super(props);
+  }
+  render() {
+    return (
+      <ListView
+      dataSource={this.generateDataSource(this.props.movieData)}
+      renderSectionHeader={this.renderSectionHeader}
+      renderRow={(rowData) => <Text>{rowData}</Text>} />
+    );
+  }
+
+  generateDataSource(movieData) {
     var getSectionData = (dataBlob, sectionID) => {
-      console.log('section:', sectionID);
         return dataBlob[sectionID];
     };
     var getRowData = (dataBlob, sectionID, rowID) => {
-      console.log('row:', rowID);
         return dataBlob[rowID];
     };
     const ds = new ListView.DataSource({
@@ -34,31 +43,30 @@ class TimeBoard extends Component {
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
     });
-    let dataBlob = {
-      section1: 'section1',
-      '11': 'hihihihi',
-      '22': 'yoyoyoy'
-    };
-    let sectionIDs = ['section1'];
-    let rowIDs = [['11', '22']];
-    this.state = {
-      dataSource: ds.cloneWithRowsAndSections(dataBlob, sectionIDs, rowIDs),
-    };
-  }
-  render() {
-    return (
-      <ListView
-      dataSource={this.state.dataSource}
-      renderSectionHeader={this.renderSectionHeader}
-      renderRow={(rowData) => <Text>{rowData}</Text>} />
-    );
+
+    let dataBlob = {};
+    let sectionIDs = [];
+    let rowIDs = [];
+    movieData.forEach((theater, theaterIndex) => {
+      dataBlob['section' + theaterIndex] = theater.description;
+      sectionIDs.push('section' + theaterIndex);
+      if (theater.showtimes && theater.showtimes.length) {
+        let rowData = [];
+        theater.showtimes.forEach((time, index) => {
+          dataBlob['row' + index] = time.movieName;
+          rowData.push('row' + index);
+        });
+        rowIDs[theaterIndex] = rowData;
+      }
+    });
+    return ds.cloneWithRowsAndSections(dataBlob, sectionIDs, rowIDs);
   }
 
   renderSectionHeader(sectionData: string, sectionID: string) {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionText}>
-          {sectionData}
+          {sectionData.theaterName}
         </Text>
       </View>
     );
@@ -70,12 +78,13 @@ class MainPage extends Component {
     super(props);
     this.state = {
       loadingData: true,
+      movieData: [],
     }
   }
   render() {
     console.log('===movieData', this.state.movieData);
     var mainStyle = this.state.loadingData ? styles.container : styles.timeBoard;
-    var timeBoardComponent = this.state.loadingData ? null : <TimeBoard />;
+    var timeBoardComponent = this.state.loadingData ? null : <TimeBoard movieData={this.state.movieData} />;
     return (
       <View style={mainStyle}>
         {<ActivityIndicatorIOS
@@ -140,7 +149,7 @@ const styles = StyleSheet.create({
   },
   timeBoard: {
     flex: 1,
-    paddingTop: 30,
+    paddingTop: 28,
     backgroundColor: '#ffffff'
   },
   welcome: {
