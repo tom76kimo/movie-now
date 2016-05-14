@@ -77,10 +77,10 @@ class TimeBoard extends Component {
   renderRow(rowData) {
     return (
       <View style={styles.rowView}>
-        <View style={{flex: 1, justifyContent: 'center',}}><Text numberOfLines={1}>{rowData.movieName}</Text></View>
+        <View style={{flex: 1, justifyContent: 'center',}}><Text style={{color: '#6D00F6'}} numberOfLines={1}>{rowData.movieName}</Text></View>
         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center',}}>
-          <View style={{flex: 1, justifyContent: 'center'}}><Text numberOfLines={1}>{rowData.times[0] || '-'}</Text></View>
-          <View style={{flex: 1, justifyContent: 'center'}}><Text numberOfLines={1}>{rowData.times[1] || '-'}</Text></View>
+          <View style={{flex: 1, justifyContent: 'center'}}><Text style={{color: '#0078ff'}} numberOfLines={1}>{rowData.times[0] || '-'}</Text></View>
+          <View style={{flex: 1, justifyContent: 'center'}}><Text style={{color: '#0078ff'}} numberOfLines={1}>{rowData.times[1] || '-'}</Text></View>
         </View>
       </View>
     );
@@ -88,7 +88,7 @@ class TimeBoard extends Component {
 
   renderSeparator(sectionID, rowID, adjacentRowHighlighted) {
     return (
-      <View key={sectionID + rowID} style={{height: 0.5, backgroundColor: '#aaaaaa', flex: 1}}></View>
+      <View key={sectionID + rowID} style={{height: 0.5, backgroundColor: '#bbbbbb', flex: 1}}></View>
     );
   }
 }
