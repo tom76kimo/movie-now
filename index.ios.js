@@ -52,14 +52,14 @@ class TimeBoard extends Component {
     movieData.forEach((theater, theaterIndex) => {
       dataBlob['section' + theaterIndex] = theater.description;
       sectionIDs.push('section' + theaterIndex);
+      let rowData = [];
       if (theater.showtimes && theater.showtimes.length) {
-        let rowData = [];
         theater.showtimes.forEach((time, index) => {
           dataBlob['row' + index] = time;
           rowData.push('row' + index);
         });
-        rowIDs[theaterIndex] = rowData;
       }
+      rowIDs[theaterIndex] = rowData;
     });
     return ds.cloneWithRowsAndSections(dataBlob, sectionIDs, rowIDs);
   }
@@ -77,7 +77,7 @@ class TimeBoard extends Component {
   renderRow(rowData) {
     return (
       <View style={styles.rowView}>
-        <View style={{flex: 1, justifyContent: 'center',}}><Text style={{color: '#6D00F6'}} numberOfLines={1}>{rowData.movieName}</Text></View>
+        <View style={{flex: 1, justifyContent: 'center',}}><Text style={{color: '#6D00F6'}} numberOfLines={1}>{rowData.movieName.replace('&#39;', '\'')}</Text></View>
         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center',}}>
           <View style={{flex: 1, justifyContent: 'center'}}><Text style={{color: '#0078ff'}} numberOfLines={1}>{rowData.times[0] || '-'}</Text></View>
           <View style={{flex: 1, justifyContent: 'center'}}><Text style={{color: '#0078ff'}} numberOfLines={1}>{rowData.times[1] || '-'}</Text></View>
@@ -116,19 +116,22 @@ class MainPage extends Component {
   }
   componentDidMount() {
     const self = this;
-    this.fetchLocation().then((position) => {
-
-      const location = position.coords.latitude + ',' + position.coords.longitude;
-      fetch(getFetchUrl(location))
-            .then((response) => response.json())
-            .then((responseData) => {
-                self.setState({
-                  loadingData: false,
-                  movieData: parseData(responseData),
-                })
-            })
-            .done();
-    })
+    this.fetchLocation()
+      .then((position) => {
+        const location = position.coords.latitude + ',' + position.coords.longitude;
+        fetch(getFetchUrl(location))
+              .then((response) => response.json())
+              .then((responseData) => {
+                  self.setState({
+                    loadingData: false,
+                    movieData: parseData(responseData),
+                  })
+              })
+              .done();
+      })
+      .catch(() => {
+        console.log('cannot get location');
+      })
   }
 
   fetchLocation() {
