@@ -99,17 +99,20 @@ class MainPage extends Component {
     this.state = {
       loadingData: true,
       movieData: [],
+      error: null,
     }
   }
   render() {
     var mainStyle = this.state.loadingData ? styles.container : styles.timeBoard;
     var timeBoardComponent = this.state.loadingData ? null : <TimeBoard movieData={this.state.movieData} />;
+    var message = this.state.error ? <Text>{this.state.error}</Text> : null;
     return (
       <View style={mainStyle}>
         {<ActivityIndicatorIOS
           animating={this.state.loadingData}
           size="large"
           hidesWhenStopped={true} />}
+        {message}
         {timeBoardComponent}
       </View>
     );
@@ -130,7 +133,9 @@ class MainPage extends Component {
               .done();
       })
       .catch(() => {
-        console.log('cannot get location');
+        self.setState({
+          error: 'Cannot get current location'
+        })
       })
   }
 
