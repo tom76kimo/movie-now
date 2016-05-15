@@ -103,15 +103,17 @@ class MainPage extends Component {
     }
   }
   render() {
-    var mainStyle = this.state.loadingData ? styles.container : styles.timeBoard;
-    var timeBoardComponent = this.state.loadingData ? null : <TimeBoard movieData={this.state.movieData} />;
-    var message = this.state.error ? <Text>{this.state.error}</Text> : null;
+    const mainStyle = this.state.loadingData ? styles.container : styles.timeBoard;
+    const timeBoardComponent = this.state.loadingData ? null : <TimeBoard movieData={this.state.movieData} />;
+    const message = this.state.error ? <Text>{this.state.error}</Text> : null;
+    const loadingMessage = this.state.loadingData ? <Text>努力為您讀取中</Text> : null;
     return (
       <View style={mainStyle}>
-        {<ActivityIndicatorIOS
+         <ActivityIndicatorIOS
           animating={this.state.loadingData}
           size="large"
-          hidesWhenStopped={true} />}
+          hidesWhenStopped={true} />
+        {loadingMessage}
         {message}
         {timeBoardComponent}
       </View>
