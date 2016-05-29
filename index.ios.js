@@ -23,9 +23,13 @@ class TimeBoard extends Component {
     super(props);
   }
   render() {
+    const dataSource = this.generateDataSource(this.props.movieData);
+    if (!dataSource) {
+      return <View><Text>No data</Text></View>;
+    }
     return (
       <ListView
-      dataSource={this.generateDataSource(this.props.movieData)}
+      dataSource={dataSource}
       renderSectionHeader={this.renderSectionHeader}
       renderRow={this.renderRow}
       renderSeparator={this.renderSeparator} />
@@ -33,6 +37,9 @@ class TimeBoard extends Component {
   }
 
   generateDataSource(movieData) {
+    if (!movieData || !movieData.forEach) {
+      return null;
+    }
     var getSectionData = (dataBlob, sectionID) => {
         return dataBlob[sectionID];
     };
@@ -125,7 +132,12 @@ class MainPage extends Component {
       .then((position) => {
         const location = position.coords.latitude + ',' + position.coords.longitude;
         fetch(getFetchUrl(location))
-              .then((response) => response.json())
+              .then((response) => {
+                if (!response) {
+                  return {};
+                }
+                return response.json();
+              })
               .then((responseData) => {
                   self.setState({
                     loadingData: false,
